@@ -103,7 +103,7 @@ function *push() {
 
     const result = yield inquirer.prompt(schema);
     if (result.confirm) {
-        yield thunkify(commandAdd.gitPush)();
+        yield thunkify(commandGit.gitPush)();
         console.log('>>> commit 成功推送到远端!'.green);
     }
 }
