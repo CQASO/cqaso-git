@@ -4,12 +4,13 @@
  *
  */
 
-const co = requre('co');
+const co = require('co');
 const colors = require('colors');
 const moment = require('moment');
 const inquirer = require('inquirer');
-
+const thunkify = require('thunkify');
 const promptMessage = colors.blue('git-tag-generate') + ': ';
+
 
 // 更新 week 设置
 moment.locale('zh-cn', {
@@ -17,20 +18,20 @@ moment.locale('zh-cn', {
     // 国内：包含1月4号的那周为每年第一周
     // 美国：包含1月1号的那周为每年第一周（苹果日历也是如此）
     // 更新了下 moment，现在规则是 包含1月1号的那周为每年第一周，新的一周起始于周一（比较好理解，苹果日历也可设置）
-    week : {
-        dow : 1, // Monday is the first day of the week.
-        doy : 7  // The week that contains Jan 1th is the first week of the year.
+    week: {
+        dow: 1, // Monday is the first day of the week.
+        doy: 7 // The week that contains Jan 1th is the first week of the year.
     }
 });
 
 // 功能类库加载
 const commandAdd = require('./lib/tag.js');
 
-function main(){
+function main() {
     let currentVersion = '';
     let currentVersionWithoutTag = '';
 
-    try{
+    try {
         currentVersion = commandAdd.getCurentVersion();
         let currentVersionArr = currentVersion.split('+');
 
@@ -38,7 +39,7 @@ function main(){
 
         console.log('!!!!!!!!!!! '.rainbow + `当前版本: ${currentVersion.white}` + ' !!!!!!!!!!!'.rainbow);
         generateVersion(currentVersionWithoutTag);
-    }catch(e){
+    } catch (e) {
         console.log(`当前目录：${process.cwd()}，不存在 package.json 文件，请到 package.json 文件所在目录执行命令`.red);
         process.exit(1);
     }
@@ -66,35 +67,30 @@ function generateVersion(currentVersionWithoutTag) {
         name: 'version',
         message: promptMessage + colors.gray('semver 规范的版本号:'),
         default: versionNextSuggest.patch,
-        choices: [
-            {
-                short: '自定义',
-                name: '自定义\n'
-                    + colors.gray('  - 格式如 ${major}.${feature}.${patch}(请遵循 semver 规范)'),
-                value: false
-            },
-            {
-                short: versionNextSuggest.patch,
-                name: 'patch   (' + versionNextSuggest.patch + ')\n'
-                    + colors.gray('  - 递增修订版本号(用于 bug 修复)'),
-                value: versionNextSuggest.patch
-            },
-            {
-                short: versionNextSuggest.feature,
-                name: 'feature (' + versionNextSuggest.feature + ')\n'
-                    + colors.gray('  - 递增特性版本号(用于向下兼容的特性新增, 递增位的右侧位需要清零)'),
-                value: versionNextSuggest.feature
-            },
-            {
-                short: versionNextSuggest.major,
-                name: 'major   (' + versionNextSuggest.major + ')\n'
-                    + colors.gray('  - 递增主版本号  (用于断代更新或大版本发布，递增位的右侧位需要清零)'),
-                value: versionNextSuggest.major
-            }
-        ]
+        choices: [{
+            short: '自定义',
+            name: '自定义\n' +
+                colors.gray('  - 格式如 ${major}.${feature}.${patch}(请遵循 semver 规范)'),
+            value: false
+        }, {
+            short: versionNextSuggest.patch,
+            name: 'patch   (' + versionNextSuggest.patch + ')\n' +
+                colors.gray('  - 递增修订版本号(用于 bug 修复)'),
+            value: versionNextSuggest.patch
+        }, {
+            short: versionNextSuggest.feature,
+            name: 'feature (' + versionNextSuggest.feature + ')\n' +
+                colors.gray('  - 递增特性版本号(用于向下兼容的特性新增, 递增位的右侧位需要清零)'),
+            value: versionNextSuggest.feature
+        }, {
+            short: versionNextSuggest.major,
+            name: 'major   (' + versionNextSuggest.major + ')\n' +
+                colors.gray('  - 递增主版本号  (用于断代更新或大版本发布，递增位的右侧位需要清零)'),
+            value: versionNextSuggest.major
+        }]
     }];
 
-    inquirer.prompt(schema).then(function (result) {
+    inquirer.prompt(schema).then(function(result) {
         if (!result.version) {
             reVersion();
         } else {
@@ -110,27 +106,27 @@ function reVersion() {
         type: 'input',
         name: 'version',
         message: promptMessage + 'semver 规范的版本号',
-        validate: function(value){
-            if(!/^\d+\.\d+\.\d+$/.test(value)){
+        validate: function(value) {
+            if (!/^\d+\.\d+\.\d+$/.test(value)) {
                 return '[X] 格式如 ${major}.${feature}.${patch} (请遵循 semver 规范)'.red;
             }
 
             let res = commandAdd.versionValidate(currentVersionWithoutTag, value);
-            if(res.pass){
+            if (res.pass) {
                 return true;
-            }else{
+            } else {
                 return '[X] '.red + res.message.red;
             }
         }
     }];
 
-    inquirer.prompt(schema).then(function(result){
+    inquirer.prompt(schema).then(function(result) {
         generateNewTag(result.version);
     });
 }
 
 // 生成新的tag
-function generateNewTag (version) {
+function generateNewTag(version) {
     let schema = [{
         type: 'confirm',
         name: 'isNeedPublishTimesTag',
@@ -138,7 +134,7 @@ function generateNewTag (version) {
         default: false
     }];
 
-    inquirer.prompt(schema).then(function(result){
+    inquirer.prompt(schema).then(function(result) {
         let newTag = commandAdd.generateTagHandInput({
             version: version,
             isNeedPublishTimesTag: result.isNeedPublishTimesTag
@@ -148,20 +144,20 @@ function generateNewTag (version) {
 }
 
 // tag 确认
-function tagConfirm(newTag){
+function tagConfirm(newTag) {
     console.log('!!!!!!!!!!! '.rainbow + `新版 tag: ${newTag.white}` + ' !!!!!!!!!!!'.rainbow);
-    co(function* () {
-        yield editPackage();
-        yield gitTagAdd();
-        yield gitTagPush();
+    co(function*() {
+        yield* editPackage(newTag);
+        yield* gitTagAdd(newTag);
+        yield* gitTagPush(newTag);
         console.log('😁  Good Job!');
     }).catch(err => {
-        console.log('😟  ' + err.red);
+        console.log('😟  ' + err.message.red);
     });
 }
 
 // 修改package
-function editPackage() {
+function *editPackage(newTag) {
     let schema = [{
         type: 'confirm',
         name: 'confirm',
@@ -169,25 +165,13 @@ function editPackage() {
         default: true
     }];
 
-    return inquirer.prompt(schema).then(function(result){
-        if(result.confirm){
-            try{
-                commandAdd.changePackage(newTag, function(err){
-                    if(err){
-                        return Promise.reject(err);
-                    }else{
-                        console.log('>>> package.json 更改成功'.green);
-                    }
-                });
-            }catch(e){
-                return Promise.reject(e.message);
-            }
-        }
-    });
+    const result = yield inquirer.prompt(schema);
+    yield thunkify(commandAdd.changePackage)(newTag);
+    console.log('>>> package.json 更改成功'.green);
 }
 
 // 执行 git tag add 命令
-function gitTagAdd() {
+function *gitTagAdd(newTag) {
     let schema = [{
         type: 'confirm',
         name: 'confirm',
@@ -195,36 +179,28 @@ function gitTagAdd() {
         default: true
     }];
 
-    return inquirer.prompt(schema)
-    .then(function(result){
-        if(result.confirm) {
-             let schema = [{
-                 type: 'input',
-                 name: 'message',
-                 message: promptMessage + 'tag 描述信息',
-                 validate: function(value){
-                     if(!value){
-                         return 'tag 描述信息不能为空';
-                     }
-                     return true;
-                 }
-             }];
-
-             return inquirer.prompt(schema);
-         }
-    }).then(result => {
-        commandAdd.gitTagAdd(newTag, result.message, function(err) {
-            if(err){
-                return Promise.reject(err);
-            }else{
-                console.log('>>> git tag 添加成功!'.green);
+    const result = yield inquirer.prompt(schema);
+    if (result.confirm) {
+        let schema = [{
+            type: 'input',
+            name: 'message',
+            message: promptMessage + 'tag 描述信息',
+            validate: function(value) {
+                if (!value) {
+                    return 'tag 描述信息不能为空';
+                }
+                return true;
             }
-        });
-    })
+        }];
+
+        yield inquirer.prompt(schema);
+        yield thunkify(commandAdd.gitTagAdd)(newTag);
+        console.log('>>> git tag 添加成功!'.green);
+    }
 }
 
 // tag推送到远端
-function gitTagPush() {
+function *gitTagPush(newTag) {
     let schema = [{
         type: 'confirm',
         name: 'confirm',
@@ -232,17 +208,11 @@ function gitTagPush() {
         default: true
     }];
 
-    return inquirer.prompt(schema).then(function(result){
-        if(result.confirm){
-            commandAdd.gitTagPush(newTag, function(err){
-                if(err){
-                    return Promise.reject(err);
-                }else{
-                    console.log('>>> tag 成功推送到远端!'.green);
-                }
-            });
-        }
-    });
+    const result = yield inquirer.prompt(schema);
+    if (result.confirm) {
+        yield thunkify(commandAdd.gitTagPush)(newTag);
+        console.log('>>> tag 成功推送到远端!'.green);
+    }
 }
 
 module.exports = main;
