@@ -17,15 +17,15 @@ const envList = ['master', 'dev'];
 // 表情列表
 const emojiList = {
     // bug
-    Bugfix: ':bug:  [bug]',
+    Bugfix: '🐛  [bug]',
     // 新功能
-    NewFeature : ':sparkles:  [feature] ',
+    NewFeature : '✨  [feature] ',
     // 文档
-    Documentation: ':books:  [document] ',
+    Documentation: '📚  [document] ',
     // 重构
-    Refactoring: ':package:  [refact] ',
+    Refactoring: '📦  [refact] ',
     // 工具
-    Tooling: ':wrench:  [config] ',
+    Tooling: '🔧  [config] ',
 };
 
 function main() {
