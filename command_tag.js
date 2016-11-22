@@ -25,7 +25,7 @@ moment.locale('zh-cn', {
 });
 
 // 功能类库加载
-const commandAdd = require('./lib/tag.js');
+const commandAdd = require('./lib/git.js');
 
 function main() {
     let currentVersion = '';
@@ -193,8 +193,8 @@ function *gitTagAdd(newTag) {
             }
         }];
 
-        yield inquirer.prompt(schema);
-        yield thunkify(commandAdd.gitTagAdd)(newTag);
+        const result = yield inquirer.prompt(schema);
+        yield thunkify(commandAdd.gitTagAdd)(newTag, result.message);
         console.log('>>> git tag 添加成功!'.green);
     }
 }

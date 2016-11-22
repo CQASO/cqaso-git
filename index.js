@@ -10,31 +10,30 @@
 const co = require('co');
 const inquirer = require('inquirer');
 
-const commandTag = require('./command_Tag.js');
+const commandTag = require('./command_tag.js');
+const commandCommit = require('./command_commit.js');
 
 function main() {
     let schema = [{
         type: 'list',
         name: 'command',
-        message: 'CQASO:push到dev或master仓库',
+        message: 'CQASO: 选择git命令',
         choices: [{
-            name: 'dev',
-            value: 'dev',
-            short: 'dev'
+            name: '提交代码到当前分支',
+            value: 'commit',
         }, {
-            name: 'master',
-            value: 'master',
-            short: 'master'
+            name: '更新tag到master',
+            value: 'tag',
         }]
     }];
 
     co(function*() {
         let result = yield inquirer.prompt(schema);
         switch (result.command) {
-            case 'dev':
-            
+            case 'commit':
+                commandCommit();
                 break;
-            case 'master':
+            case 'tag':
                 commandTag();
                 break;
         }
