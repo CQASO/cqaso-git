@@ -19,13 +19,13 @@ const emojiList = {
     // bug
     Bugfix: ':bug:  [bug]',
     // 新功能
-    NewFeature : ':sparkles:  [feature]',
+    NewFeature : ':sparkles:  [feature] ',
     // 文档
-    Documentation: ':books:  [document]',
+    Documentation: ':books:  [document] ',
     // 重构
-    Refactoring: ':package:  [refact]',
+    Refactoring: ':package:  [refact] ',
     // 工具
-    Tooling: ':wrench:  [config]',
+    Tooling: ':wrench:  [config] ',
 };
 
 function main() {
