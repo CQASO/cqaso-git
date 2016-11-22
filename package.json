@@ -1,6 +1,6 @@
 {
   "name": "cqaso_git",
-  "version": "1.0.2+16w48b",
+  "version": "1.0.3+16w48c",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -15,6 +15,7 @@
     "co": "^4.6.0",
     "colors": "^1.1.2",
     "inquirer": "^1.2.3",
-    "moment": "^2.16.0"
+    "moment": "^2.16.0",
+    "thunkify": "^2.1.2"
   }
 }
