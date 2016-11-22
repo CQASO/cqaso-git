@@ -1,6 +1,6 @@
 {
   "name": "cqaso_git",
-  "version": "1.0.3+16w48c",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "bin": {
