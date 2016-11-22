@@ -46,7 +46,7 @@ function *submit() {
         type: 'list',
         name: 'emoji',
         message: promptMessage + 'git提交修改的类型:',
-        default: 'bug',
+        default: 'Bugfix',
         choices: [
             {
                 name: '🐛  bug',
@@ -87,7 +87,7 @@ function *submit() {
 
     const messageObj = yield inquirer.prompt(schemaMessage);
 
-    yield thunkify(commandGit.gitCommit)(emojiObj.emoji + messageObj.message);
+    yield thunkify(commandGit.gitCommit)(emojiList[emojiObj.emoji] + messageObj.message);
     console.log('>>> git commit 提交成功!'.green);
 
 }
