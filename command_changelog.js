@@ -7,7 +7,7 @@ const thunkify = require('thunkify');
 
 const program = {
     // submit message正则匹配
-    message: '\[added\]|\[removed\]|\[changed\]|\[fixed\]',
+    message: '\\[bug\\]|\\[feature\\]|\\[document\\]|\\[refact\\]|\\[config\\]',
     // 输出文档路径
     out: 'CHANGELOG.md',
 }
