@@ -14,7 +14,7 @@ const program = {
 
 const commitRegex = new RegExp(program.message);
 
-function main(version) {
+function main() {
 
     co(function *() {
         // 获得最新tag
@@ -25,43 +25,34 @@ function main(version) {
 
         // 优化log信息
         const formatedLog = formatLog(tag, log);
-        console.log(formatedLog);
+        // 写入changelog文件
+        writeLog(formatedLog);
 
-        // writeLog(log, tag);
+        console.log('😁  Good Job!');
 
     }).catch(err => {
         console.log('😟  ' + err.message.red);
     });
-
-
-    // latestTag(function (tag) {
-    //     changelog(tag, function (log) {
-    //         log = log.map(function (subject) {
-    //             return subject.replace(/^([a-f|0-9]+)/, '[$1](../../commit/$1)')
-    //         });
-    //         log = '- ' + log.join('\n- ');
-    //         if (program.stdout) {
-    //             console.log(log);
-    //         } else {
-    //             writeLog(log, tag);
-    //         }
-    //         if (callback)
-    //             callback(log);
-    //         }
-    //     );
-    // });
 }
 
 function formatLog(tag, log) {
-    const title = tag + ' - ' + new Date().toUTCString();
+    const title = `[${tag}-${formatTime(new Date())}](../../releases/tag/${tag})`;
+
     const dashes = title.replace(/./g, '-');
+
     log = log.map(function (subject) {
         return subject.replace(/^([a-f|0-9]+)/, '[$1](../../commit/$1)')
     });
+
     log = '- ' + log.join('\n- ');
     let src = title + '\n' + dashes + '\n\n';
     src += log;
     return src;
+}
+
+function formatTime(date) {
+    return date.toLocaleString('zh-CN', { hour12: false })
+      .replace(/\//g, '-').replace(/\b\d\b/g, '0$&');
 }
 
 function writeLog(log) {
@@ -73,7 +64,8 @@ function writeLog(log) {
 }
 
 function changelog(tag, next) {
-    exec('git log --no-merges --oneline ' + tag + '..HEAD', function (err, log) {
+    const range = tag + '..HEAD';
+    exec('git log --no-merges --oneline ' + range, function (err, log) {
         next(err, parseLog(log));
     });
 }
@@ -126,15 +118,6 @@ function lastSemverTag(tags) {
         process.exit();
     }
     return tag;
-}
-
-function execHandler(cb) {
-    return function (err, stdout, stderr) {
-        if (err)
-            throw new Error(err);
-        if (cb)
-            cb(stdout);
-        };
 }
 
 module.exports = main;

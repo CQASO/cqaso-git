@@ -10,6 +10,7 @@ const moment = require('moment');
 const inquirer = require('inquirer');
 const thunkify = require('thunkify');
 const promptMessage = colors.blue('git-tag-generate') + ': ';
+const commandChangelog = require('./command_changelog.js');
 
 
 // 更新 week 设置
@@ -148,6 +149,7 @@ function tagConfirm(newTag) {
     console.log('!!!!!!!!!!! '.rainbow + `新版 tag: ${newTag.white}` + ' !!!!!!!!!!!'.rainbow);
     co(function*() {
         yield* editPackage(newTag);
+        yield* editChangelog();
         yield* gitTagAdd(newTag);
         yield* gitTagPush(newTag);
         console.log('😁  Good Job!');
@@ -166,8 +168,26 @@ function *editPackage(newTag) {
     }];
 
     const result = yield inquirer.prompt(schema);
-    yield thunkify(commandAdd.changePackage)(newTag);
-    console.log('>>> package.json 更改成功'.green);
+    if (result.confirm) {
+        yield thunkify(commandAdd.changePackage)(newTag);
+        console.log('>>> package.json 更改成功'.green);
+    }
+}
+
+// 修改changelog
+function *editChangelog() {
+    let schema = [{
+        type: 'confirm',
+        name: 'confirm',
+        message: promptMessage + '是否记录commit信息到 CHANGELOG.md',
+        default: true
+    }];
+
+    const result = yield inquirer.prompt(schema);
+    if (result.confirm) {
+        commandChangelog();
+        console.log('>>> CHANGELOG.md 更改成功'.green);
+    }
 }
 
 // 执行 git tag add 命令

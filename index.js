@@ -12,7 +12,6 @@ const inquirer = require('inquirer');
 
 const commandTag = require('./command_tag.js');
 const commandCommit = require('./command_commit.js');
-const commandChangelog = require('./command_changelog.js');
 
 function main() {
     let schema = [{
@@ -25,9 +24,6 @@ function main() {
         }, {
             name: '更新tag到master',
             value: 'tag',
-        }, {
-            name: '更新Changelog',
-            value: 'changelog',
         }]
     }];
 
@@ -40,8 +36,6 @@ function main() {
             case 'tag':
                 commandTag();
                 break;
-            case 'changelog':
-                commandChangelog();
         }
     });
 }
