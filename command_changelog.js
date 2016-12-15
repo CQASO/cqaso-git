@@ -36,7 +36,7 @@ function main() {
 }
 
 function formatLog(tag, log) {
-    const title = `[${tag}-${formatTime(new Date())}](../../releases/tag/${tag})`;
+    const title = `[${tag}](../../releases/tag/${tag})` + '     ${formatTime(new Date())}';
 
     const dashes = title.replace(/./g, '-');
 
