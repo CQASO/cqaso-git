@@ -16,7 +16,7 @@ const commitRegex = new RegExp(program.message);
 
 function main() {
 
-    co(function *() {
+    return co(function *() {
         // 获得最新tag
         const tag = yield thunkify(latestTag)();
 

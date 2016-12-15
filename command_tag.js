@@ -148,8 +148,8 @@ function generateNewTag(version) {
 function tagConfirm(newTag) {
     console.log('!!!!!!!!!!! '.rainbow + `新版 tag: ${newTag.white}` + ' !!!!!!!!!!!'.rainbow);
     co(function*() {
-        yield* editPackage(newTag);
         yield* editChangelog();
+        yield* editPackage(newTag);
         yield* gitTagAdd(newTag);
         yield* gitTagPush(newTag);
         console.log('😁  Good Job!');
@@ -160,18 +160,8 @@ function tagConfirm(newTag) {
 
 // 修改package
 function *editPackage(newTag) {
-    let schema = [{
-        type: 'confirm',
-        name: 'confirm',
-        message: promptMessage + '是否更改 package.json 文件的 version 信息',
-        default: true
-    }];
-
-    const result = yield inquirer.prompt(schema);
-    if (result.confirm) {
-        yield thunkify(commandAdd.changePackage)(newTag);
-        console.log('>>> package.json 更改成功'.green);
-    }
+    yield thunkify(commandAdd.changePackage)(newTag);
+    console.log('>>> package.json 更改成功'.green);
 }
 
 // 修改changelog
@@ -185,7 +175,7 @@ function *editChangelog() {
 
     const result = yield inquirer.prompt(schema);
     if (result.confirm) {
-        commandChangelog();
+        yield commandChangelog();
         console.log('>>> CHANGELOG.md 更改成功'.green);
     }
 }
