@@ -14,7 +14,7 @@ const program = {
 
 const commitRegex = new RegExp(program.message);
 
-function main() {
+function main(newTag) {
 
     return co(function *() {
         // 获得最新tag
@@ -24,7 +24,7 @@ function main() {
         const log = yield thunkify(changelog)(tag);
 
         // 优化log信息
-        const formatedLog = formatLog(tag, log);
+        const formatedLog = formatLog(newTag, log);
         // 写入changelog文件
         writeLog(formatedLog);
 

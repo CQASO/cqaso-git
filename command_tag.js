@@ -148,7 +148,7 @@ function generateNewTag(version) {
 function tagConfirm(newTag) {
     console.log('!!!!!!!!!!! '.rainbow + `新版 tag: ${newTag.white}` + ' !!!!!!!!!!!'.rainbow);
     co(function*() {
-        yield* editChangelog();
+        yield* editChangelog(newTag);
         yield* editPackage(newTag);
         yield* gitTagAdd(newTag);
         yield* gitTagPush(newTag);
@@ -165,7 +165,7 @@ function *editPackage(newTag) {
 }
 
 // 修改changelog
-function *editChangelog() {
+function *editChangelog(newTag) {
     let schema = [{
         type: 'confirm',
         name: 'confirm',
@@ -175,7 +175,7 @@ function *editChangelog() {
 
     const result = yield inquirer.prompt(schema);
     if (result.confirm) {
-        yield commandChangelog();
+        yield commandChangelog(newTag);
         console.log('>>> CHANGELOG.md 更改成功'.green);
     }
 }
