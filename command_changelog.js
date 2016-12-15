@@ -6,10 +6,8 @@ const colors = require('colors');
 const thunkify = require('thunkify');
 
 const program = {
-    // changelog标题
-    title: '',
     // submit message正则匹配
-    message: '\\[added\\]|\\[removed\\]|\\[changed\\]|\\[fixed\\]',
+    message: '\[added\]|\[removed\]|\[changed\]|\[fixed\]',
     // 输出文档路径
     out: 'CHANGELOG.md',
 }
@@ -25,10 +23,16 @@ function main(version) {
         // 获得log信息
         const log = yield thunkify(changelog)(tag);
 
-        console.log(log);
+        // 优化log信息
+        const formatedLog = formatLog(tag, log);
+        console.log(formatedLog);
+
+        // writeLog(log, tag);
+
     }).catch(err => {
         console.log('😟  ' + err.message.red);
     });
+
 
     // latestTag(function (tag) {
     //     changelog(tag, function (log) {
@@ -48,16 +52,24 @@ function main(version) {
     // });
 }
 
-function writeLog(log) {
-    var title = program.title + ' - ' + new Date().toUTCString();
-    var dashes = title.replace(/./g, '-');
-    var src = title + '\n' + dashes + '\n\n';
+function formatLog(tag, log) {
+    const title = tag + ' - ' + new Date().toUTCString();
+    const dashes = title.replace(/./g, '-');
+    log = log.map(function (subject) {
+        return subject.replace(/^([a-f|0-9]+)/, '[$1](../../commit/$1)')
+    });
+    log = '- ' + log.join('\n- ');
+    let src = title + '\n' + dashes + '\n\n';
     src += log;
+    return src;
+}
+
+function writeLog(log) {
     if (fs.existsSync(program.out)) {
-        src += '\n\n\n';
-        src += fs.readFileSync(program.out).toString();
+        log += '\n\n\n';
+        log += fs.readFileSync(program.out).toString();
     }
-    fs.writeFileSync(program.out, src);
+    fs.writeFileSync(program.out, log);
 }
 
 function changelog(tag, next) {
